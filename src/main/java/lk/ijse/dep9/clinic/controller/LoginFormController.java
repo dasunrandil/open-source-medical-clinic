@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lk.ijse.dep9.clinic.misc.CryptoUtil;
 import lk.ijse.dep9.clinic.security.SecurityContextHolder;
 import lk.ijse.dep9.clinic.security.User;
 import lk.ijse.dep9.clinic.security.UserRole;
@@ -52,18 +53,31 @@ public class LoginFormController {
 //
 //            Statement stm = connection.createStatement();
 //            ResultSet rst = stm.executeQuery(sql);
-            String sql = "SELECT role FROM User WHERE username=? AND password=?";
+
+//            String sql = "SELECT role FROM User WHERE username=? AND password=?";
+//            PreparedStatement stm = connection.prepareStatement(sql);
+//            stm.setString(1,username);
+//            stm.setString(2,password);
+//            ResultSet rst = stm.executeQuery();
+
+            String sql = "SELECT role FROM User WHERE username=?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1,username);
-            stm.setString(2,password);
             ResultSet rst = stm.executeQuery();
 
             Scene scene = null;
             if(rst.next()){
+                String cipherText = rst.getString("password");
+                if (!CryptoUtil.getSha256Hex(password).equals(cipherText)){
+                    new Alert(Alert.AlertType.ERROR, "Invalid login credentials");
+                    txtUserName.requestFocus();
+                    txtUserName.selectAll();
+                    return;
+                }
                 String role = rst.getString("role");
                 switch (role){
                     case "Admin":
-                        System.out.println("gggg");
+//                        System.out.println("gggg");
                         scene = new Scene(FXMLLoader.load(this.getClass().getResource("/view/AdminDashBoard.fxml")));
                         break;
                     case "Doctor":
