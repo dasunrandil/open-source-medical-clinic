@@ -60,13 +60,14 @@ public class LoginFormController {
 //            stm.setString(2,password);
 //            ResultSet rst = stm.executeQuery();
 
-            String sql = "SELECT role FROM User WHERE username=?";
+            String sql = "SELECT role,password FROM User WHERE username=?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1,username);
             ResultSet rst = stm.executeQuery();
 
             Scene scene = null;
             if(rst.next()){
+//                System.out.println(rst.getString("password"));
                 String cipherText = rst.getString("password");
                 if (!CryptoUtil.getSha256Hex(password).equals(cipherText)){
                     new Alert(Alert.AlertType.ERROR, "Invalid login credentials");
